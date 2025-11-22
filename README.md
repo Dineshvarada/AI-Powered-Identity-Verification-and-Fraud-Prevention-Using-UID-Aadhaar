@@ -1,41 +1,82 @@
-# AI-Powered-Identity-Verification-and-Fraud-Prevention-Using-UID-Aadhaar
+Aadhaar OCR & AI-Powered Identity Verification API
+Deep Learning (ResNet-18) + EasyOCR + Flask API
+This project provides a complete Aadhaar Verification System using:
 
-# Aadhaar OCR & Identity Verification
+Deep Learning (ResNet-18) to classify Aadhaar as
+➤ Real Aadhaar
+➤ Fake Aadhaar
+EasyOCR to extract text from Aadhaar images
+Flask REST API for backend integration
+Optional lookup of Aadhaar numbers using a local CSV database
+Optional image serving via /get_image
+This is the same system you built in Google Colab and exported into Python.
 
-**Project:** Aadhaar OCR + Identity Verification & Fraud Detection 
-## Overview
-This repository provides:
-- OCR extraction of Aadhaar card fields using Tesseract (pluggable OCR backends).
-- Fraud / tamper detection model (CNN) to flag tampered Aadhaar cards.
-- A lightweight API (Flask) for server-side integration and an optional Streamlit demo UI.
-- Secure defaults: Aadhaar numbers are masked and raw PII storage is disabled by default.
+🚀 Features
+✅ 1. Fake/Real Aadhaar Classification
+A pre-trained ResNet-18 binary classifier (aadhar_resnet_model.pth) identifies whether an Aadhaar card is genuine.
 
-> ⚠️ This project processes highly sensitive personal data (Aadhaar). Read `SECURITY.md` before running or publishing.
+✅ 2. OCR Extraction using EasyOCR
+Extracts:
+Name
+Aadhaar number
+Address
+DOB
+Other details present on card
 
-## Features
-- Upload Aadhaar image → OCR extraction (name, Aadhaar number, DOB, address block)
-- Tamper detection (CNN model) with a confidence score
-- Masking of Aadhaar numbers in responses
-- Configurable OCR engine (`TESSERACT`, `GOOGLE_VISION`, `AWS_TEXTRACT`)
-- Docker support for easy deployment
+✅ 3. Flask REST API
+With the following endpoints:
+🔹 GET /
+{"message": "Aadhaar Verification API is running!"}
+🔹 POST /predict
+Uploads an Aadhaar image → Returns:
+Real / Fake prediction
+Extracted text via OCR
+Request
+Content-Type: multipart/form-data
+file = <aadhaar-image>
 
-Files of interest
-app.py — Flask API entry (uploads, OCR call, parsing, masking)
-src/ocr_engine.py — wrapper for OCR backends
-src/document_verification.py — CNN tamper detection
-openapi.yaml — API schema
-requirements.txt — dependencies
-Dockerfile / docker-compose.yml
+{
+  "filename": "1.jpg",
+  "Aadhaar_Status": "Real Aadhaar",
+  "Extracted_Text": "GOVERNMENT OF INDIA 1234 5678 9012 ..."
+}
 
-Model & dataset
-Large model files and any datasets should not be committed. Use cloud storage (Google Drive link, S3). Example pattern:
-Add models/README.md describing where to download pre-trained .h5 files.
-Add script scripts/download_model.sh to fetch model into the right folder (gitignored).
+ET /get_image?image_id=ID
+Returns Aadhaar image from a folder (local dataset).
+If CSV contains Aadhaar number for that image_id, it is sent in response headers.
+Response Headers Example
+aadhaar_number: 123456789012
 
-Security & privacy
-By default STORE_RAW=false (raw OCR text and images not persisted).
-Aadhaar numbers masked in logs & responses (only last 4 digits shown).
-Use TLS in production and store secrets in a secret manager.
-See SECURITY.md.
+🧠 Model Details
+Architecture:
+ResNet-18
+Modified final layer with:
+model.fc = nn.Linear(model.fc.in_features, 2)
+→ Class 0 = Real
+→ Class 1 = Fake
+Preprocessing for inference:
+Resize 224×224
+ToTensor
+Normalize with ImageNet stats
 
-google drive: "https://colab.research.google.com/drive/1k57c3DqBU1C9zEBegJXBLWLeoBIe4bPa?usp=drive_link"
+Health ceck
+Response:
+🔍 OCR Extraction Pipeline
+Uses EasyOCR (English reader)
+
+📌 Future Improvements
+Face/Photo matching
+Aadhaar number masking
+Address field extraction parser
+Frontend for uploading & viewing results
+Deploy via Docker
+
+💡 Credits
+PyTorch for deep learning
+EasyOCR for text recognition
+Flask for API
+
+
+Run reader.readtext()
+
+All detected text lines are concatenated
