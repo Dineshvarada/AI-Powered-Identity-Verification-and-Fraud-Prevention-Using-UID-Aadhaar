@@ -37,3 +37,5 @@ By default STORE_RAW=false (raw OCR text and images not persisted).
 Aadhaar numbers masked in logs & responses (only last 4 digits shown).
 Use TLS in production and store secrets in a secret manager.
 See SECURITY.md.
+
+google drive: "https://colab.research.google.com/drive/1k57c3DqBU1C9zEBegJXBLWLeoBIe4bPa?usp=drive_link"
